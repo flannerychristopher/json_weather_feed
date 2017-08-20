@@ -1,6 +1,9 @@
 const http = require('http');
-const apiKey = 'cacdf29dc2be47d484a105606152306';
-// const location = 'Boston';
+
+const reqData = {
+  apiKey: 'cacdf29dc2be47d484a105606152306',
+  url: 'http://api.apixu.com/v1/',
+}
 
 function printWeather(location, temperature, condition) {
   message = `${location}, ${temperature}, ${condition}`;
@@ -8,8 +11,7 @@ function printWeather(location, temperature, condition) {
 }
 
 function getWeather(location) {
-  const request = http.get(`http://api.apixu.com/v1/current.json?key=${apiKey}&q=${location}`, (res) => {
-    console.dir(res.statusCode);
+  const request = http.get(`${reqData.url}current.json?key=${reqData.apiKey}&q=${location}`, (res) => {
 
     let rawData = '';
     res.on('data', (chunk) => {
@@ -18,12 +20,11 @@ function getWeather(location) {
 
     res.on('end', () => {
       const parsedData = JSON.parse(rawData);
-      // console.log(parsedData);
-      // console.log(parsedData.location.name);
-
       printWeather(parsedData.location.name, parsedData.current.temp_c, parsedData.current.condition.text);
-    })
+    });
   });
 }
 
-get
+// const cities = ['Singapore', 'Boston', 'Tokyo'];
+const cities = process.argv.slice(2);
+cities.forEach(getWeather);
