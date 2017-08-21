@@ -12,6 +12,7 @@ function printError(e) {
 
 function get(location) {
   const originalQuery = location.replace('_', ' ');
+  let error;
   try {
     const request = http.get(`http://api.apixu.com/v1/current.json?key=${api.key}&q=${location}`, (res) => {
       if (res.statusCode === 200) {
@@ -22,12 +23,13 @@ function get(location) {
 
         res.on('end', () => {
           try {
+            res.setEncoding('utf8');
             const parsedData = JSON.parse(rawData);
             if (parsedData.location) {
               printWeather(parsedData.location.name, parsedData.current.temp_c, parsedData.current.condition.text);
             } else {
-              const queryError = new Error(`Could not find weather for ${originalQuery}`);
-              console.log(queryError);
+              error = new Error(`Could not find weather for ${originalQuery}`);
+              console.log(error);
             }
 
           } catch (e) {
@@ -41,8 +43,8 @@ function get(location) {
 
       } else {
         const message = `There was an error fetching the weather for ${originalQuery}: (${http.STATUS_CODES[res.statusCode]})`;
-        const statusCodeError = new Error(message);
-        printError(statusCodeError);
+        error = new Error(message);
+        printError(error);
       }
     });
 
